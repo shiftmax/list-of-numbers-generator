@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate List of Numbers</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+      color: #007BFF;
+    }
+
+    form {
+      max-width: 500px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      width: 45%;
+      margin: 10px;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .form-group label {
+      flex-basis: 100%;
+      padding: 5px;
+      font-weight: bold;
+    }
+
+    .form-group input,
+    .form-group select {
+      flex-basis: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-top: 5px;
+    }
+
+    button {
+      flex-basis: 100%;
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    textarea {
+      width: 100%;
+      margin-top: 20px;
+      padding: 10px;
+      resize: vertical;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Generate List of Numbers</h1>
+  <form>
+    <div class="form-group">
+      <label for="start">Start:</label>
+      <input type="number" id="start" value="1">
+    </div>
+    <div class="form-group">
+      <label for="end">End:</label>
+      <input type="number" id="end" value="10">
+    </div>
+    <div class="form-group">
+      <label for="step">Step:</label>
+      <input type="number" id="step" value="1">
+    </div>
+    <div class="form-group">
+      <label for="decimals">Decimals:</label>
+      <input type="number" id="decimals" value="0">
+    </div>
+    <div class="form-group">
+      <label for="comma">Comma:</label>
+      <input type="checkbox" id="comma">
+    </div>
+    <div class="form-group">
+      <label for="separator">Separator:</label>
+      <select id="separator">
+        <option value="\n">New Line</option>
+        <option value=" ">Space</option>
+        <option value="">None</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="padLength">Pad Length:</label>
+      <input type="number" id="padLength" value="0">
+    </div>
+    <div class="form-group">
+      <label for="rate">Rate:</label>
+      <input type="number" id="rate" value="1">
+    </div>
+    <div class="form-group">
+      <label for="prefix">Prefix:</label>
+      <input type="text" id="prefix">
+    </div>
+    <div class="form-group">
+      <label for="suffix">Suffix:</label>
+      <input type="text" id="suffix">
+    </div>
+    <div class="form-group" style="flex-basis: 100%;">
+      <button type="button" onclick="generateList()">Generate</button>
+    </div>
+    <div class="form-group" style="flex-basis: 100%;">
+      <button type="button" onclick="randomizeList()">Randomize</button>
+    </div>
+    <div class="form-group" style="flex-basis: 100%;">
+      <button type="button" onclick="reverseList()">Reverse</button>
+    </div>
+    <div class="form-group" style="flex-basis: 100%;">
+      <button type="button" onclick="selectAll()">Select All</button>
+    </div>
+    <div class="form-group" style="flex-basis: 100%;">
+      <button type="button" onclick="copyList()">Copy</button>
+    </div>
+    <textarea id="list" rows="10" cols="50" placeholder="Generated list will appear here"></textarea>
+  </form>
+
+  <script>
+    function generateList() {
+      let start = parseFloat(document.getElementById("start").value);
+      let end = parseFloat(document.getElementById("end").value);
+      let step = parseFloat(document.getElementById("step").value);
+      let decimals = parseInt(document.getElementById("decimals").value);
+      let comma = document.getElementById("comma").checked;
+      let separator = document.getElementById("separator").value.replace(/\\n/g, "\n");
+      let padLength = parseInt(document.getElementById("padLength").value) || 0;
+      let rate = parseFloat(document.getElementById("rate").value) || 1;
+      let prefix = document.getElementById("prefix").value;
+      let suffix = document.getElementById("suffix").value;
+      let list = document.getElementById("list");
+      list.value = "";
+      let numbers = [];
+      
+      for (let i = start; i < end + step; i += step) {
+        let number = i;
+        if (rate) {
+          number *= rate;
+        }
+        if (decimals) {
+          number = number.toFixed(decimals);
+        } else {
+          number = Math.round(number).toString();
+        }
+        if (comma) {
+          number = numberWithCommas(number);
+        }
+        if (padLength) {
+          number = number.padStart(padLength, "0");
+        }
+        numbers.push(prefix + number + suffix);
+      }
+      
+      if (numbers[numbers.length - 1] != end.toString()) {
+        numbers.push(end.toString());
+      }
+      
+      list.value = numbers.join(separator);
+    }
+
+    function numberWithCommas(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function randomizeList() {
+      let list = document.getElementById("list");
+      let separator = document.getElementById("separator").value.replace(/\\n/g, "\n");
+      let numbers = list.value.split(separator);
+      
+      for (let i = numbers.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+      }
+      
+      list.value = numbers.join(separator);
+    }
+
+    function reverseList() {
+      let list = document.getElementById("list");
+      let separator = document.getElementById("separator").value.replace(/\\n/g, "\n");
+      let numbers = list.value.split(separator);
+      numbers.reverse();
+      list.value = numbers.join(separator);
+    }
+
+    function selectAll() {
+      let list = document.getElementById("list");
+      list.select();
+    }
+
+    function copyList() {
+      let list = document.getElementById("list");
+      list.select();
+      document.execCommand("copy");
+      alert("List copied to clipboard!");
+    }
+  </script>
+</body>
+</html>
